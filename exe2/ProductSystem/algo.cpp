@@ -12,6 +12,7 @@
 #include <functional>
 #include <vector>
 #include <string>
+#include <assert.h>
 
 
 #define PRODUCT_DB_FILE		"product.db"
@@ -169,11 +170,17 @@ void printPoorlySellingProducts(const ProductList& pl)
 class discount 
 { 
 public:
+    discount(float percentDiscount) : _dis((1 - (percentDiscount / 100))) {}
+
     // This operator overloading enables calling 
     // operator function () on objects of discount 
-    void operator () (Product &p) const { 
-        p.setPrice(p.price()*0.90); 
+    Product operator () (Product &p) const { 
+        Product newP = Product(p);
+        newP.setPrice(p.price()*_dis); 
+        return newP;
     } 
+    
+    float _dis;
 }; 
 /**
  * Set a discount on all products - Using for_each()
@@ -184,24 +191,58 @@ void addDiscountUsingForEach(ProductList& pl)
     //std::for_each(pl.begin(), pl.end(), [](Product &p){ p.setPrice(p.price()*0.90); });
     
     // Using functor
-    std::for_each(pl.begin(), pl.end(), discount() );
+    std::for_each(pl.begin(), pl.end(), discount(10) );
 }
 
+// Clamp utility
+template <class T, class Compare >
+constexpr const T& clamp( const T& v, const T& lo , const T& hi , Compare comp )
+{
+    return assert( !comp(hi , lo) ),
+    comp(v, lo) ? lo : comp(hi , v) ? hi : v;
+}
+template <class T>
+constexpr const T& clamp( const T& v, const T& lo , const T& hi )
+{
+    return ::clamp( v, lo , hi , std::less <>() );
+}
 
 /**
  * Set a discount on all products - Using transform()
  */
 void addDiscountUsingTransform(ProductList& pl)
 {
-    int percentage;
-    std::cout << "Enter a percentage(between 10-90): ";
-
-    std::istream_iterator<int> eos;              // end-of-stream iterator
-    std::istream_iterator<int> iit (std::cin);   // stdin iterator
-
-    if (iit!=eos) percentage=std::clamp(*iit, 10, 90);
+        float percentage;
+        std::cout << "Enter a percentage(between 10-90): ";
+        
+        // instream iterator
+        std::istream_iterator<int> eos;              // end-of-stream iterator
+        std::istream_iterator<int> iit (std::cin);   // stdin iterator
+        
+        if (iit!=eos) percentage= clamp(*iit,10,90);    
+        
+        // outstream iterator
+        std::ostream_iterator<Product> output(std::cout, "\n");
+        
+        std::transform(pl.begin(), pl.end(), output, discount(percentage));
     
-    std::transform(pl.begin(), pl.end(), pl.begin(), [](Product &p){ return [](Product &p){ p.setPrice(p.price()*x); } });
+//     // outstream iterator
+//     std::ostream_iterator<Product> output(std::cout, "\n");
+//     
+//     std::transform(pl.begin(), pl.end(), output, discount(
+//         return [=]() {
+//             std::cout << "Enter a percentage(between 10-90): ";
+//             
+//             // instream iterator
+//             std::istream_iterator<int> eos;              // end-of-stream iterator
+//             std::istream_iterator<int> iit (std::cin);   // stdin iterator
+//             
+//             if (iit!=eos) 
+//                 return (float)clamp(*iit,10,90); 
+//             return 0;
+//         }
+//     )
+//     );
 }
 
 
@@ -210,6 +251,14 @@ void addDiscountUsingTransform(ProductList& pl)
  */
 void calcTotalSoldProducts(ProductList& pl)
 {
+    int init = 0;
+    std::vector<unsigned int> sold_product_count;
+    
+    std::transform(pl.begin(), pl.end(), std::back_inserter(sold_product_count), std::mem_fun_ref(&Product::sold)); /////sold_product_count);
+    
+    int accum = std::accumulate(sold_product_count.begin(), sold_product_count.end(), init);
+    
+    std::cout << "Total Sold Products: " << accum << std::endl;
 }
 
 

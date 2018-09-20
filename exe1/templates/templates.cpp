@@ -16,9 +16,8 @@ public:
     MyArray<T, N> & operator =(const MyArray<T, N> & p) {
         std::cout << "assignment operator called" << std::endl;
         T * j = p.begin();
-        for(T* i = begin(); i!=end(); i++){
+        for(T* i = begin(); i!=end(); i++, j++){
             *i = *j;
-            j++;
         }
         return *this;
     }
@@ -27,9 +26,8 @@ public:
     MyArray<T, N> & operator =(const MyArray<U, N> & p) {
         std::cout << "assignment operator called" << std::endl;
         U * j = p.begin();
-        for(T* i = begin(); i!=end(); i++){
+        for(T* i = begin(); i!=end(); i++, j++){
             *i = *j;
-            j++;
         }
         return *this;
     }
@@ -39,9 +37,8 @@ public:
         std::cout << "copy constructor called" << std::endl;
         _elements = new T[N];
         U * j = p.begin();
-        for(T* i = begin(); i!=end(); i++){
+        for(T* i = begin(); i!=end(); i++, j++){
             *i = *j;
-            j++;
         }
     }
     // Destructor
