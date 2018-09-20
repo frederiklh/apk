@@ -76,7 +76,6 @@ std::istream& operator>> ( std::istream& i, Product& p )
 void productDBRead(ProductList& pl, const std::string& fileName)
 {
     ////OLDSTYLE
-    {
     //pl.clear();
     //std::ifstream pFile( fileName.c_str() );
     //while( !pFile.eof() )
@@ -85,7 +84,6 @@ void productDBRead(ProductList& pl, const std::string& fileName)
     //  pFile >> p;
     //  if( pFile ) pl.push_back( p );
     //}
-    }
     pl.clear();
     std::ifstream s(fileName.c_str());
     std::istream_iterator<Product> it1(s);  /* Start of file */
