@@ -20,9 +20,7 @@ void freeFunction( const std::shared_ptr<Event>& event )
 {
    // Protecting stdio since its not thread safe
   std::lock_guard<std::mutex> lock(stdioProt );
-
-    /* MISSING EVENT PRINT OUT */
-  
+  std::cout << *event << std::endl;
 }
 
 
