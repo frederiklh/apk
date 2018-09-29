@@ -5,6 +5,10 @@
 #include <thread>
 #include <functional>
 #include <chrono>
+#include <mutex>
+#include <boost/any.hpp>
+#include <boost/function.hpp>
+
 
 class Timer
 {
@@ -24,6 +28,7 @@ private:
   bool          terminator_;
   std::map<int, std::function<void(const std::shared_ptr<Event> &)> > callbacks_;
   int idIndexCounter_ = 0;
+  std::mutex mapProt_;
 };
 
 

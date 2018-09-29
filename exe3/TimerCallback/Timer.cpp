@@ -37,15 +37,18 @@ int Timer::timerThreadFunction()
 }
 
 int Timer::attach(std::function<void(const std::shared_ptr<Event>&)> cb){
+    std::lock_guard<std::mutex> lock(mapProt_);
     callbacks_[idIndexCounter_] = cb;
     return idIndexCounter_++;
 }
 
 void Timer::detach(int cbId){
+    std::lock_guard<std::mutex> lock(mapProt_);
     callbacks_.erase(cbId);
 }
 
 void Timer::notifyAll(const std::shared_ptr<Event>& any){
-    for(auto it=callbacks_.begin(); it!=callbacks_.end(); it++)
-        it->second(any);
+    std::lock_guard<std::mutex> lock(mapProt_);
+    for(auto &it :callbacks_)
+        it.second(any);
 }

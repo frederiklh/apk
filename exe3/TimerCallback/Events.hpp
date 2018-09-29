@@ -18,6 +18,8 @@ public:
     return creationTime_;
   }
   
+  virtual ~Event(){} // Needed for EventOther to get printed in 'freeFunction'
+  
 private:
   std::chrono::time_point<std::chrono::system_clock> creationTime_;
 };
